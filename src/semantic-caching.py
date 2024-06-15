@@ -1,7 +1,5 @@
 import asyncio
 from collections import OrderedDict
-import json
-from typing import Optional
 from upstash_redis.asyncio import Redis
 from dotenv import load_dotenv
 import os
