@@ -81,18 +81,27 @@ def main():
 
     # Set the vectors in the cache 
     cache.set(key1, vector1, data1)
+    sleep(1)
     cache.set(key2, vector2, data2)
+    sleep(1)
     # Query a single key
     result1 = cache.get(key1,vector1)
+    sleep(1)
     result2 = cache.get(key2,vector2)
+    sleep(1)
     print(f"Query result for {key1}: {result1}")
     print(f"Query result for {key2}: {result2}")
 
     # Delete a key
-    # print(cache.delete(vector1))
-    # print(cache.delete(vector2))
+    print(cache.delete(vector1))
+    sleep(1)
+    print(cache.delete(vector2))
+    sleep(1)
     result = cache.get(key1,vector1)
+    sleep(1)
     print(f"Query result for {key1}: {result}")
+    cache.flush()
+    sleep(1)
 
     
     # # Set multiple keys in the cache
