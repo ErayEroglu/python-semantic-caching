@@ -40,7 +40,13 @@ index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
 
 index.upsert(
   vectors=[
-    ("1", [0.6, 0.8], {"field": "value"}),
+    ("1", [0.6, 0.8] + 254 * [0], {"field": "value"}),
+  ]
+)
+
+index.upsert(
+  vectors=[
+    ("1", [0.6, 0.8] + 254 * [0], {"field": "value"}),
   ]
 )
 print('done')
