@@ -26,7 +26,7 @@ Semantic Cache allows you to:
 
 ### Installation
 
-After creating a vector database, you should install the repository by using the following command.
+After creating a vector database, you should install the repository using the following command.
 
 ```bash
 git clone git@github.com:ErayEroglu/python-semantic-caching.git  
@@ -48,41 +48,38 @@ UPSTASH_VECTOR_REST_TOKEN=your_secret_token_here
 
 ### Using Semantic Cache
 
-After setting up your environment variables and installing the repository, you should activate the virtual environment by entering the following command in the src diretory:
+After setting up environment variables and installing the repository, the virtual environment must be activated the  by entering the following command to the console in the src directory:
 
 ```bash
 source ./bin/activate
  ```
 
-```typescript
-import { SemanticCache } from "@upstash/semantic-cache";
-import { Index } from "@upstash/vector";
+Then, a basic demo can be created like this:
 
-// 👇 your vector database
-const index = new Index();
+```python
+def main():
+    # set environment variables
+    load_dotenv()
+    UPSTASH_VECTOR_REST_URL = os.getenv('UPSTASH_VECTOR_REST_URL')
+    UPSTASH_VECTOR_REST_TOKEN = os.getenv('UPSTASH_VECTOR_REST_TOKEN')
 
-// 👇 your semantic cache
-const semanticCache = new SemanticCache({ index, minProximity: 0.95 });
-
-async function runDemo() {
-  await semanticCache.set("Capital of Turkey", "Ankara");
-  await delay(1000);
-
-  // 👇 outputs: "Ankara"
-  const result = await semanticCache.get("What is Turkey's capital?");
-  console.log(result);
-}
-
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-runDemo();
+    # initialize Upstash database
+ index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
+ cache = SemanticCache(index=index, min_proximity=0.7)
+ cache.set('The most crowded city in Turkiye', 'Istanbul')
+    sleep(1)
+ result = cache.get('Which city has the most population in Turkiye?')
+    sleep(1)
+    print(result)
+    
+if __name__ == '__main__':
+    main() # outputs Istanbul
 ```
 
 ### The `minProximity` Parameter
 
 The `minProximity` parameter ranges from `0` to `1`. It lets you define the minimum relevance score to determine a cache hit. The higher this number, the more similar your user input must be to the cached content to be a hit. In practice, a score of 0.95 indicates a very high similarity, while a score of 0.75 already indicates a low similarity. For example, a value of 1.00, the highest possible, would only accept an _exact_ match of your user query and cache content as a cache hit.
+In the examples, a relatively low minProximity of 0.7 is used to reduce latency. The database has low dimensions, 96, and a lightweight library is used to create vectors from texts, both aiming to reduce computing time. If higher similarity is required, higher dimensions and more powerful libraries like Torch and Transformers are needed to generate vectors. You can edit the text_to_vector function to suit your needs. However, Spacy is also a powerful NLP library for Python, offering a range of pre-trained models for various languages, and it is used in our implementation.
 
 ## Examples
 
@@ -93,65 +90,52 @@ The following examples demonstrate how you can utilize Semantic Cache in various
 
 ### Basic Semantic Retrieval
 
-```typescript
-await semanticCache.set("Capital of France", "Paris");
-await delay(1000);
-
-// 👇 outputs "Paris"
-const result = await semanticCache.get("What's the capital of France?");
+```python
+cache.set('Capital of Turkiye', 'Ankara')
+sleep(1)
+result = cache.get('What is the capital of Turkiye?')
+sleep(1)
+print(result) # outputs Ankara
 ```
 
 ### Handling Synonyms
 
-```typescript
-await semanticCache.set("largest city in USA by population", "New York");
-await delay(1000);
-
-// 👇 outputs "New York"
-const result = await semanticCache.get("which is the most populated city in the USA?");
-```
-
-### Multilingual Queries
-
-Note: Your embedding model needs to support the languages you intend to use.
-
-```typescript
-await semanticCache.set("German Chancellor", "Olaf Scholz");
-await delay(1000);
-
-// 👇 "Who is the chancellor of Germany?" -> outputs "Olaf Scholz"
-const result = await semanticCache.get("Wer ist der Bundeskanzler von Deutschland?");
+```python
+cache.set('The last champion of European Football Championship', 'Italy')
+sleep(1)
+result = cache.get('Which country is the winner of the most recent European Football Championship?')
+sleep(1)
+print(result) # outputs Italy
 ```
 
 ### Complex Queries
 
-```typescript
-await semanticCache.set("year in which the Berlin wall fell", "1989");
-await delay(1000);
-
-// 👇 outputs "1989"
-const result = await semanticCache.get("what's the year the Berlin wall destroyed?");
+```python
+cache.set('The largest economy in the world, 'USA')
+sleep(1)
+result = cache.get('Which country has the highest GDP?')
+sleep(1)
+print(result) # outputs USA
 ```
 
 ### Different Contexts
 
-```typescript
-await semanticCache.set("the chemical formula for water", "H2O");
-await semanticCache.set("the healthiest drink on a hot day", "water");
-
-await delay(1000);
-
-// 👇 outputs "water"
-const result = await semanticCache.get("what should i drink when it's hot outside?");
-
-// 👇 outputs "H2O"
-const result = await semanticCache.get("tell me water's chemical formula");
+```python
+cache.set("New York population as of 2020 census", "8.8 million")
+cache.set("Major economic activities in New York", "Finance, technology, and tourism")
+sleep(1)
+result1 = cache.get("How many people lived in NYC according to the last census?")
+sleep(1)
+result2 = cache.get("What are the key industries in New York?")
+sleep(1)
+print(result1) # outputs 8.8 million
+print(result2) # outputs Finance, technology, and tourism
 ```
 
 ## Contributing
 
-We appreciate your contributions! If you'd like to contribute to this project, please fork the repository, make your changes, and submit a pull request.
+We appreciate your contributions! If you'd like to contribute to this project, please fork the repository, make changes, and submit a pull request.
 
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+It is distributed under the MIT License. See `LICENSE` for more information.

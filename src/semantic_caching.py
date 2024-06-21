@@ -68,20 +68,26 @@ class SemanticCache:
         return doc.vector.tolist()
 
 def main():
-    
+    # set environment variables
     load_dotenv()
     UPSTASH_VECTOR_REST_URL = os.getenv('UPSTASH_VECTOR_REST_URL')
     UPSTASH_VECTOR_REST_TOKEN = os.getenv('UPSTASH_VECTOR_REST_TOKEN')
 
-    # Initialize Upstash Vector Index
+    # initialize Upstash database
     index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
     cache = SemanticCache(index=index, min_proximity=0.7)
-    cache.set('The most crowded city in Turkiye', 'Istanbul')
+    cache.set("New York population as of 2020 census", "8.8 million")
+    cache.set("Major economic activities in New York", "Finance, technology, and tourism")
     sleep(1)
-    result = cache.get('Which city has the most population in Turkiye?')
+    result1 = cache.get("How many people lived in NYC according to the last census?")
     sleep(1)
-    #print(result)
-    
+    result2 = cache.get("What are the key industries in New York?")
+    sleep(1)
+    print(result1) # outputs 8.8 million
+    print(result2) # outputs Finance, technology, and tourism
+    cache.flush()
+    sleep(1)
     
 if __name__ == '__main__':
     main()
+    
