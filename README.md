@@ -14,7 +14,6 @@ Semantic Cache allows you to:
 
 - **Uses semantic similarity**: Stores cache entries by their meaning, not just the literal characters
 - **Handles synonyms**: Recognizes and handles synonyms
-- **Multi-language support**: Works across different languages (if configured with multilingual vector models)
 - **Complex query support**: Understands long and nested user queries
 - **Customizable**: Set a custom proximity threshold to filter out less relevant results
 
