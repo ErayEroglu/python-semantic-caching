@@ -39,7 +39,7 @@ First, create an Upstash Vector database [here](https://console.upstash.com/vect
 > [!NOTE]  
 > Different embedding models are great for different use cases. For example, if low latency is a priority, choose a model with a smaller dimension size like `bge-small-en-v1.5`. If accuracy is important, choose a model with more dimensions.
 
-Create a `.env` file in the root directory of your project and add your Upstash Vector URL and token:
+Create a `.env` file in the src directory of your project and add your Upstash Vector URL and token:
 
 ```plaintext
 UPSTASH_VECTOR_REST_URL=https://example.upstash.io
