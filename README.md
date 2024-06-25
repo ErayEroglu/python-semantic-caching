@@ -63,8 +63,7 @@ def main():
     UPSTASH_VECTOR_REST_TOKEN = os.getenv('UPSTASH_VECTOR_REST_TOKEN')
 
     # initialize Upstash database
-    index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
-    cache = SemanticCache(index=index, min_proximity=0.7)
+    cache = SemanticCache(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN, min_proximity=0.7)
     cache.set('The most crowded city in Turkiye', 'Istanbul')
     sleep(1)
     result = cache.get('Which city has the most population in Turkiye?')
