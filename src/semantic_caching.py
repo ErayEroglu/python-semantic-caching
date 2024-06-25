@@ -8,9 +8,9 @@ import os
 
 class SemanticCache:
     id = 0
-    def __init__(self, index, min_proximity: float = 0.9):
+    def __init__(self, url, token, min_proximity: float = 0.9):
         self.min_proximity = min_proximity
-        self.index = index
+        self.index = Index(url=url, token=token)
 
     def get(self, key):
         vector = self.text_to_vector(key)
@@ -74,8 +74,7 @@ def main():
     UPSTASH_VECTOR_REST_TOKEN = os.getenv('UPSTASH_VECTOR_REST_TOKEN')
 
     # initialize Upstash database
-    index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
-    cache = SemanticCache(index=index, min_proximity=0.7)
+    cache = SemanticCache(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN, min_proximity=0.7)
     cache.set("New York population as of 2020 census", "8.8 million")
     cache.set("Major economic activities in New York", "Finance, technology, and tourism")
     sleep(1)
