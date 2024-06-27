@@ -1,3 +1,4 @@
+import json
 from time import sleep
 from typing import List
 from upstash_vector import Index
@@ -5,6 +6,7 @@ from dotenv import load_dotenv
 import os
 from langchain.globals import set_llm_cache
 from langchain_openai import OpenAI
+from langchain_core.outputs.generation import Generation
 import time
 
 class SemanticCache:
@@ -18,23 +20,15 @@ class SemanticCache:
     def get(self, key):
         response = self.query_key(key)
         if response is None or response.score <= self.min_proximity:
-            print("Not found in cache")
             return None
         self.is_cached = True
-        return response.metadata['data']
+        return self._loads_generations(response.metadata['data'])
          
     def lookup(self, prompt, llm_string : str = None):
-        value = self.get(prompt)
-        if value is None:
-            return None
-        return value[1]
+        return self.get(prompt)
     
-    def update(self, prompt, response,  llm_string : str = None):
-        if not self.is_cached:
-            print("Updating cache")
-            print(llm_string)
-            self.set(prompt, (response, llm_string[0].text))
-        self.is_cached = False
+    def update(self, prompt,  llm_string : str = None, result : str = None):
+        self.set(prompt, self._dumps_generations(result))
 
     def query_key(self, key):
         response = self.index.query(
@@ -76,6 +70,27 @@ class SemanticCache:
             return response.id
         return None
     
+    def _dumps_generations(self, generations):
+        def generation_to_dict(generation):
+            if isinstance(generation, Generation):
+                return {
+                    "text": generation.text,
+                    "generation_info": generation.generation_info
+                }
+            else:
+                raise TypeError(f"Object of type {generation.__class__.__name__} is not JSON serializable")
+        return json.dumps([generation_to_dict(g) for g in generations])
+
+    def _loads_generations(self, json_str):
+        def dict_to_generation(d):
+            if isinstance(d, dict):
+                return Generation(text=d["text"], generation_info=d["generation_info"])
+            else:
+                raise TypeError(f"Object of type {d.__class__.__name__} is not a valid Generation dict")
+
+        return [dict_to_generation(d) for d in json.loads(json_str)]
+
+        
 
 def main():
     # set environment variables
