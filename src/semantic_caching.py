@@ -1,28 +1,44 @@
 from time import sleep
-import spacy
 from typing import List
-from upstash_vector import Index, Vector
+from upstash_vector import Index
 from dotenv import load_dotenv
 import os
-
+from langchain.globals import set_llm_cache
+from langchain_openai import OpenAI
+import time
 
 class SemanticCache:
     id = 0
+    is_cached = False
+    
     def __init__(self, url, token, min_proximity: float = 0.9):
         self.min_proximity = min_proximity
         self.index = Index(url=url, token=token)
 
     def get(self, key):
-        vector = self.text_to_vector(key)
-        response = self.query_key(vector)
-        if response == None:
+        response = self.query_key(key)
+        if response is None or response.score <= self.min_proximity:
+            print("Not found in cache")
             return None
-        if response.score > self.min_proximity:
-            return next(iter(response.metadata.items()))[1]
+        self.is_cached = True
+        return response.metadata['data']
+         
+    def lookup(self, prompt, llm_string : str = None):
+        value = self.get(prompt)
+        if value is None:
+            return None
+        return value[1]
+    
+    def update(self, prompt, response,  llm_string : str = None):
+        if not self.is_cached:
+            print("Updating cache")
+            print(llm_string)
+            self.set(prompt, (response, llm_string[0].text))
+        self.is_cached = False
 
-    def query_key(self, input_vector):
+    def query_key(self, key):
         response = self.index.query(
-            vector=input_vector,
+            data=key,
             top_k=1,
             include_metadata=True
         )
@@ -31,11 +47,10 @@ class SemanticCache:
     def set(self, key, data):
         if (type(key) == list) and (type(data) == list):
             for i in range(len(key)):
-                self.index.upsert(
-                    vectors=[Vector(id=str(self.id), vector=self.text_to_vector(key[i]), metadata={key[i]: data[i]})])
+                self.index.upsert([(str(self.id), key[i], {'data': data[i]})])
                 self.id += 1
-        elif (type(key) == str) and (type(data) == str):
-            self.index.upsert(vectors=[Vector(id=str(self.id), vector=self.text_to_vector(key), metadata={key: data})])
+        else:
+            self.index.upsert([(str(self.id), key, {'data' : data})])
             self.id += 1
 
     def delete(self, key):
@@ -56,16 +71,11 @@ class SemanticCache:
         return isinstance(lst, list) and all(isinstance(sublist, list) for sublist in lst)
 
     def find_id(self, key):
-        vector = self.text_to_vector(key)
-        response = self.query_key(vector)
+        response = self.query_key(key)
         if response:
             return response.id
         return None
     
-    def text_to_vector(self,text):
-        nlp = spacy.load("en_core_web_sm") 
-        doc = nlp(text)
-        return doc.vector.tolist()
 
 def main():
     # set environment variables
@@ -75,18 +85,29 @@ def main():
 
     # initialize Upstash database
     cache = SemanticCache(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN, min_proximity=0.7)
-    cache.set("New York population as of 2020 census", "8.8 million")
-    cache.set("Major economic activities in New York", "Finance, technology, and tourism")
-    sleep(1)
-    result1 = cache.get("How many people lived in NYC according to the last census?")
-    sleep(1)
-    result2 = cache.get("What are the key industries in New York?")
-    sleep(1)
-    print(result1) # outputs 8.8 million
-    print(result2) # outputs Finance, technology, and tourism
     cache.flush()
     sleep(1)
     
+    llm = OpenAI(model_name="gpt-3.5-turbo-instruct", n=2, best_of=2)
+    set_llm_cache(cache)
+    
+    prompt1 = "Why is the Moon always showing the same side?"
+    prompt2 = "How come we always see one face of the moon?"
+
+    start_time = time.time()
+    response1 = llm.invoke(prompt1)
+    print(response1)
+    end_time = time.time()
+    print("Time difference 1:", end_time - start_time, "seconds")
+    sleep(1)
+    
+    start_time = time.time()
+    response2 = llm.invoke(prompt2)
+    print(response2)
+    end_time = time.time()
+    time_difference = end_time - start_time
+    print("Time difference 2:", time_difference, "seconds")
+
 if __name__ == '__main__':
     main()
-    
+
