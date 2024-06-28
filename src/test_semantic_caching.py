@@ -11,7 +11,6 @@ UPSTASH_VECTOR_REST_URL = os.getenv('UPSTASH_VECTOR_REST_URL')
 UPSTASH_VECTOR_REST_TOKEN = os.getenv('UPSTASH_VECTOR_REST_TOKEN')
 
 # Initialize Upstash Vector Index
-index = Index(url=UPSTASH_VECTOR_REST_URL, token=UPSTASH_VECTOR_REST_TOKEN)
 
 class TestSemanticCache(unittest.TestCase):
     key1 = "key1"
@@ -21,7 +20,7 @@ class TestSemanticCache(unittest.TestCase):
     
     def setUp(self):
         # Initialize the SemanticCache instance
-        self.cache = SemanticCache(index=index, min_proximity=0.7)
+        self.cache = SemanticCache(UPSTASH_VECTOR_REST_URL, UPSTASH_VECTOR_REST_TOKEN, min_proximity=0.7)
         self.refresh()
         
     def test_get_existing_key(self):

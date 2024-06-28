@@ -11,7 +11,6 @@ import time
 
 class SemanticCache:
     id = 0
-    is_cached = False
     
     def __init__(self, url, token, min_proximity: float = 0.9):
         self.min_proximity = min_proximity
@@ -21,11 +20,11 @@ class SemanticCache:
         response = self.query_key(key)
         if response is None or response.score <= self.min_proximity:
             return None
-        self.is_cached = True
-        return self._loads_generations(response.metadata['data'])
+        return response.metadata['data']
          
     def lookup(self, prompt, llm_string : str = None):
-        return self.get(prompt)
+        result = self.get(prompt)
+        return self._loads_generations(result) if result else None
     
     def update(self, prompt,  llm_string : str = None, result : str = None):
         self.set(prompt, self._dumps_generations(result))
