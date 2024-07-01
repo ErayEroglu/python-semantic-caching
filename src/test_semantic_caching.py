@@ -1,7 +1,6 @@
 from time import sleep
 import unittest
 from semantic_caching import SemanticCache
-from upstash_vector import Index, Vector
 from dotenv import load_dotenv
 import os
 

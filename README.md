@@ -77,7 +77,6 @@ if __name__ == '__main__':
 ### The `minProximity` Parameter
 
 The `minProximity` parameter ranges from `0` to `1`. It lets you define the minimum relevance score to determine a cache hit. The higher this number, the more similar your user input must be to the cached content to be a hit. In practice, a score of 0.95 indicates a very high similarity, while a score of 0.75 already indicates a low similarity. For example, a value of 1.00, the highest possible, would only accept an _exact_ match of your user query and cache content as a cache hit.
-In the examples, a relatively low minProximity of 0.7 is used to reduce latency. The database has low dimensions, 96, and a lightweight library is used to create vectors from texts, both aiming to reduce computing time. If higher similarity is required, higher dimensions and more powerful libraries like Torch and Transformers are needed to generate vectors. You can edit the text_to_vector function to suit your needs. However, Spacy is also a powerful NLP library for Python, offering a range of pre-trained models for various languages, and it is used in our implementation.
 
 ## Examples
 
