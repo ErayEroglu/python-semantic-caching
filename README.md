@@ -25,21 +25,21 @@ Semantic Cache allows you to:
 
 ### Installation
 
-After creating a vector database, you should install the repository using the following command.
+After creating a vector database, you should install the repository using the following command:
 
 ```bash
 pip install scaching
 ```
 
-To use it in your project, you must import it at the beginning of your file:
+To use it in your project, you must import it at the beginning of your file.
 
 ```python
-from scaching import SemanticCache
+from scaching import Semantic Cache
  ```
 
 ### Setup
 
-First, create an Upstash Vector database [here](https://console.upstash.com/vector). You'll need the `url` and `token` credentials to connect your semantic cache. Important: Choose any pre-made embedding model when creating your database.
+First, create an Upstash Vector database [here](https://console.upstash.com/vector). You'll need the `url` and `token` credentials to connect your semantic cache. Importantly, choose any pre-made embedding model when creating your database.
 
 > [!NOTE]  
 > Different embedding models are great for different use cases. For example, if low latency is a priority, choose a model with a smaller dimension size like `bge-small-en-v1.5`. If accuracy is important, choose a model with more dimensions.
@@ -109,7 +109,7 @@ print(result) # outputs Italy
 ### Complex Queries
 
 ```python
-cache.set('The largest economy in the world, 'USA')
+cache.set('The largest economy in the world', 'USA')
 sleep(1)
 result = cache.get('Which country has the highest GDP?')
 sleep(1)
